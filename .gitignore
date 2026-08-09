@@ -1,0 +1,14 @@
+# Environment config & secrets
+env.js
+
+# Node / dependencies
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
