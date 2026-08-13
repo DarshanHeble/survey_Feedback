@@ -533,12 +533,21 @@ function submitSurvey() {
     GOOGLE_SCRIPT_URL &&
     GOOGLE_SCRIPT_URL !== "YOUR_COPIED_WEB_APP_URL_HERE"
   ) {
+    const payloadStr = JSON.stringify(userResponses);
+
+    // Primary: fetch with redirect follow
     fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(userResponses),
-    }).catch((err) => console.error("Error submitting to Google Sheet:", err));
+      headers: { "Content-Type": "text/plain" },
+      body: payloadStr,
+    }).catch((err) => {
+      console.error("Error submitting to Google Sheet via fetch:", err);
+      // Fallback: sendBeacon
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(GOOGLE_SCRIPT_URL, payloadStr);
+      }
+    });
   }
 
   // Calculate Accuracy
