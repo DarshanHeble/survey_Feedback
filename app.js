@@ -569,33 +569,33 @@ function formatGoogleSheetsRow(data) {
   const secD = data.sectionD || {};
 
   let consentText = "Agreed & Consented";
-  if (typeof consent === "object" && consent.statement) {
-    consentText = `Agreed (${consent.statement})`;
+  if (typeof consent === "object" && consent.consent_status) {
+    consentText = consent.consent_status;
   } else if (typeof consent === "boolean") {
     consentText = consent ? "Agreed & Consented" : "Declined";
   }
 
   return [
     new Date().toISOString(),
-    consentText,
-    secA.age || '',
-    secA.gender || '',
-    secA.degree || '',
-    secA.year || '',
-    secA.experience || '',
-    secA.primary_lang || '',
-    secB.used_ai || '',
-    Array.isArray(secB.tools) ? secB.tools.join(', ') : '',
-    secB.frequency || '',
-    Array.isArray(secB.uses) ? secB.uses.join(', ') : '',
-    secB.confidence || '',
-    secD.overall_difficulty || '',
-    Array.isArray(secD.influential_factors) ? secD.influential_factors.join(', ') : '',
-    secD.ai_indistinguishable || '',
-    secD.trust_ai || '',
-    secD.comments || '',
-    JSON.stringify(data.snippetAnswers || {}),
-    JSON.stringify(data)
+    consentText,                           // Col 2: Consent Status
+    secA.age || '',                        // Col 3: Age
+    secA.gender || '',                     // Col 4: Gender
+    secA.degree || '',                     // Col 5: Degree Program
+    secA.year || '',                       // Col 6: Current Year
+    secA.experience || '',                 // Col 7: Programming Experience
+    secA.primary_lang || '',               // Col 8: Primary Language
+    secB.used_ai || '',                    // Col 9: Used AI Tools
+    Array.isArray(secB.tools) ? secB.tools.join(', ') : '',       // Col 10: AI Tools Used
+    secB.frequency || '',                  // Col 11: AI Usage Frequency
+    Array.isArray(secB.uses) ? secB.uses.join(', ') : '',         // Col 12: AI Purpose
+    secB.confidence || '',                 // Col 13: AI Confidence
+    secD.overall_difficulty || '',         // Col 14: Overall Difficulty
+    Array.isArray(secD.influential_factors) ? secD.influential_factors.join(', ') : '', // Col 15: Influential Factors
+    secD.ai_indistinguishable || '',       // Col 16: AI Indistinguishable Perception
+    secD.trust_ai || '',                   // Col 17: Trust in AI Code
+    secD.comments || '',                   // Col 18: Comments & Feedback
+    JSON.stringify(data.snippetAnswers || {}), // Col 19: Snippet Answers
+    JSON.stringify(data)                   // Col 20: Full Data JSON
   ];
 }
 
