@@ -522,10 +522,44 @@ const GOOGLE_API_KEY =
     ? window.ENV.GOOGLE_API_KEY
     : "";
 
+const GOOGLE_CLIENT_ID =
+  typeof window !== "undefined" && window.ENV && window.ENV.GOOGLE_CLIENT_ID
+    ? window.ENV.GOOGLE_CLIENT_ID
+    : "";
+
 const GOOGLE_SCRIPT_URL =
   typeof window !== "undefined" && window.ENV && window.ENV.GOOGLE_SCRIPT_URL
     ? window.ENV.GOOGLE_SCRIPT_URL
     : "";
+
+let tokenClient = null;
+let googleAccessToken = null;
+
+// Initialize Google Identity Services token client if GOOGLE_CLIENT_ID is provided
+function initGoogleAuth() {
+  if (
+    typeof window !== "undefined" &&
+    window.google &&
+    window.google.accounts &&
+    GOOGLE_CLIENT_ID &&
+    GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE"
+  ) {
+    tokenClient = window.google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: "https://www.googleapis.com/auth/spreadsheets",
+      callback: (tokenResponse) => {
+        if (tokenResponse && tokenResponse.access_token) {
+          googleAccessToken = tokenResponse.access_token;
+          executeSheetsAppend(userResponses);
+        }
+      },
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(initGoogleAuth, 1000);
+});
 
 // Helper to format values for Google Sheets API row append
 function formatGoogleSheetsRow(data) {
@@ -558,6 +592,27 @@ function formatGoogleSheetsRow(data) {
   ];
 }
 
+function executeSheetsAppend(data) {
+  if (!GOOGLE_SHEETS_SPREADSHEET_ID || GOOGLE_SHEETS_SPREADSHEET_ID === "YOUR_GOOGLE_SPREADSHEET_ID_HERE") return;
+
+  const rowValues = formatGoogleSheetsRow(data);
+  const apiEndpoint = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED${GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_API_KEY_HERE' ? '&key=' + GOOGLE_API_KEY : ''}`;
+
+  const headers = { "Content-Type": "application/json" };
+  if (googleAccessToken) {
+    headers["Authorization"] = `Bearer ${googleAccessToken}`;
+  }
+
+  fetch(apiEndpoint, {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify({ values: [rowValues] })
+  })
+    .then(res => res.json())
+    .then(result => console.log("Google Sheets API Append Result:", result))
+    .catch(err => console.error("Google Sheets API Error:", err));
+}
+
 // SUBMIT SURVEY & CALCULATE BENCHMARK RESULTS
 function submitSurvey() {
   saveCurrentSnippetData();
@@ -569,26 +624,16 @@ function submitSurvey() {
     return;
   }
 
-  // 1. Submit directly via Google Sheets REST API v4 if Spreadsheet ID & API Key are configured
+  // 1. Google Sheets REST API v4 Append
   if (
     GOOGLE_SHEETS_SPREADSHEET_ID &&
-    GOOGLE_SHEETS_SPREADSHEET_ID !== "YOUR_GOOGLE_SPREADSHEET_ID_HERE" &&
-    GOOGLE_API_KEY &&
-    GOOGLE_API_KEY !== "YOUR_GOOGLE_API_KEY_HERE"
+    GOOGLE_SHEETS_SPREADSHEET_ID !== "YOUR_GOOGLE_SPREADSHEET_ID_HERE"
   ) {
-    const rowValues = formatGoogleSheetsRow(userResponses);
-    const apiEndpoint = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&key=${GOOGLE_API_KEY}`;
-
-    fetch(apiEndpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        values: [rowValues]
-      })
-    })
-      .then(res => res.json())
-      .then(result => console.log("Google Sheets API Append Result:", result))
-      .catch(err => console.error("Google Sheets API Error:", err));
+    if (tokenClient && !googleAccessToken) {
+      tokenClient.requestAccessToken({ prompt: '' });
+    } else {
+      executeSheetsAppend(userResponses);
+    }
   }
 
   // 2. Backup: Submit via Google Apps Script Web App Endpoint
