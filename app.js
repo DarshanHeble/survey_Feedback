@@ -27,17 +27,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Setup dynamic specify input toggles for "Other" options
 function setupOtherOptionToggles() {
+  const toggleBox = (checkEl, boxEl) => {
+    if (!checkEl || !boxEl) return;
+    if (checkEl.checked) {
+      boxEl.classList.remove('hidden');
+      const input = boxEl.querySelector('input');
+      if (input && document.activeElement !== input) input.focus();
+    } else {
+      boxEl.classList.add('hidden');
+    }
+  };
+
   // Q3 Degree Other radio
   const q3Radios = document.querySelectorAll('input[name="q3_degree"]');
   const q3OtherBox = document.getElementById('q3_other_box');
+  const q3OtherRadio = document.getElementById('q3_other_radio');
   q3Radios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      if (radio.value === 'Other' && radio.checked) {
-        q3OtherBox.classList.remove('hidden');
-        q3OtherBox.querySelector('input').focus();
-      } else {
-        q3OtherBox.classList.add('hidden');
-      }
+    ['change', 'click'].forEach(evt => {
+      radio.addEventListener(evt, () => toggleBox(q3OtherRadio, q3OtherBox));
     });
   });
 
@@ -45,13 +52,8 @@ function setupOtherOptionToggles() {
   const q8OtherCheck = document.getElementById('q8_other_check');
   const q8OtherBox = document.getElementById('q8_other_box');
   if (q8OtherCheck && q8OtherBox) {
-    q8OtherCheck.addEventListener('change', () => {
-      if (q8OtherCheck.checked) {
-        q8OtherBox.classList.remove('hidden');
-        q8OtherBox.querySelector('input').focus();
-      } else {
-        q8OtherBox.classList.add('hidden');
-      }
+    ['change', 'click'].forEach(evt => {
+      q8OtherCheck.addEventListener(evt, () => toggleBox(q8OtherCheck, q8OtherBox));
     });
   }
 
@@ -59,13 +61,8 @@ function setupOtherOptionToggles() {
   const q10OtherCheck = document.getElementById('q10_other_check');
   const q10OtherBox = document.getElementById('q10_other_box');
   if (q10OtherCheck && q10OtherBox) {
-    q10OtherCheck.addEventListener('change', () => {
-      if (q10OtherCheck.checked) {
-        q10OtherBox.classList.remove('hidden');
-        q10OtherBox.querySelector('input').focus();
-      } else {
-        q10OtherBox.classList.add('hidden');
-      }
+    ['change', 'click'].forEach(evt => {
+      q10OtherCheck.addEventListener(evt, () => toggleBox(q10OtherCheck, q10OtherBox));
     });
   }
 
@@ -73,13 +70,8 @@ function setupOtherOptionToggles() {
   const q38OtherCheck = document.getElementById('q38_other_check');
   const q38OtherBox = document.getElementById('q38_other_box');
   if (q38OtherCheck && q38OtherBox) {
-    q38OtherCheck.addEventListener('change', () => {
-      if (q38OtherCheck.checked) {
-        q38OtherBox.classList.remove('hidden');
-        q38OtherBox.querySelector('input').focus();
-      } else {
-        q38OtherBox.classList.add('hidden');
-      }
+    ['change', 'click'].forEach(evt => {
+      q38OtherCheck.addEventListener(evt, () => toggleBox(q38OtherCheck, q38OtherBox));
     });
   }
 }
