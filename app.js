@@ -631,7 +631,7 @@ function submitSurvey() {
     return;
   }
 
-  // 1. Google Sheets REST API v4 Append
+  // 1. Google Sheets REST API v4 Append (Primary)
   if (
     GOOGLE_SHEETS_SPREADSHEET_ID &&
     GOOGLE_SHEETS_SPREADSHEET_ID !== "YOUR_GOOGLE_SPREADSHEET_ID_HERE"
@@ -641,10 +641,8 @@ function submitSurvey() {
     } else {
       executeSheetsAppend(userResponses);
     }
-  }
-
-  // 2. Backup: Submit via Google Apps Script Web App Endpoint
-  if (
+  } else if (
+    // 2. Backup: Submit via Google Apps Script Web App Endpoint ONLY if Sheets API ID is not configured
     GOOGLE_SCRIPT_URL &&
     GOOGLE_SCRIPT_URL !== "YOUR_COPIED_WEB_APP_URL_HERE"
   ) {
