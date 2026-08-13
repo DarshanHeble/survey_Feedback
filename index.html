@@ -191,7 +191,13 @@
               <label class="option-card"><input type="radio" name="q3_degree" value="B.Sc. Computer Science" /><span class="opt-label">B.Sc. Computer Science</span></label>
               <label class="option-card"><input type="radio" name="q3_degree" value="M.Sc. Computer Science" /><span class="opt-label">M.Sc. Computer Science</span></label>
               <label class="option-card"><input type="radio" name="q3_degree" value="B.Tech / BE (CSE/IT)" /><span class="opt-label">B.Tech / BE (CSE/IT)</span></label>
-              <label class="option-card"><input type="radio" name="q3_degree" value="Other" /><span class="opt-label">Other</span></label>
+              <label class="option-card option-card-other">
+                <input type="radio" name="q3_degree" value="Other" id="q3_other_radio" />
+                <span class="opt-label">Other</span>
+              </label>
+            </div>
+            <div class="other-specify-box hidden" id="q3_other_box">
+              <input type="text" class="form-input" name="q3_degree_other_text" placeholder="Please specify your degree program..." />
             </div>
           </div>
 
@@ -264,7 +270,11 @@
               <label class="option-card"><input type="checkbox" name="q8_tools" value="Gemini" /><span class="opt-label">Gemini</span></label>
               <label class="option-card"><input type="checkbox" name="q8_tools" value="Claude" /><span class="opt-label">Claude</span></label>
               <label class="option-card"><input type="checkbox" name="q8_tools" value="Cursor AI" /><span class="opt-label">Cursor AI</span></label>
+              <label class="option-card"><input type="checkbox" name="q8_tools" value="Other" id="q8_other_check" /><span class="opt-label">Other</span></label>
               <label class="option-card"><input type="checkbox" name="q8_tools" value="None" /><span class="opt-label">None</span></label>
+            </div>
+            <div class="other-specify-box hidden" id="q8_other_box">
+              <input type="text" class="form-input" name="q8_tools_other_text" placeholder="Please specify other AI tools..." />
             </div>
           </div>
 
@@ -289,7 +299,10 @@
               <label class="option-card"><input type="checkbox" name="q10_uses" value="Learning programming" /><span class="opt-label">Learning programming</span></label>
               <label class="option-card"><input type="checkbox" name="q10_uses" value="Explaining code" /><span class="opt-label">Explaining code</span></label>
               <label class="option-card"><input type="checkbox" name="q10_uses" value="Completing assignments" /><span class="opt-label">Completing assignments</span></label>
-              <label class="option-card"><input type="checkbox" name="q10_uses" value="Other" /><span class="opt-label">Other</span></label>
+              <label class="option-card"><input type="checkbox" name="q10_uses" value="Other" id="q10_other_check" /><span class="opt-label">Other</span></label>
+            </div>
+            <div class="other-specify-box hidden" id="q10_other_box">
+              <input type="text" class="form-input" name="q10_uses_other_text" placeholder="Please specify what else you use AI for..." />
             </div>
           </div>
 
@@ -456,7 +469,10 @@
               <label class="option-card"><input type="checkbox" name="q38_factors" value="Modularity" /><span class="opt-label">Modularity</span></label>
               <label class="option-card"><input type="checkbox" name="q38_factors" value="SQL Query Style" /><span class="opt-label">SQL Query Style</span></label>
               <label class="option-card"><input type="checkbox" name="q38_factors" value="Overall Coding Style" /><span class="opt-label">Overall Coding Style</span></label>
-              <label class="option-card"><input type="checkbox" name="q38_factors" value="Other" /><span class="opt-label">Other</span></label>
+              <label class="option-card"><input type="checkbox" name="q38_factors" value="Other" id="q38_other_check" /><span class="opt-label">Other</span></label>
+            </div>
+            <div class="other-specify-box hidden" id="q38_other_box">
+              <input type="text" class="form-input" name="q38_factors_other_text" placeholder="Please specify other influencing factors..." />
             </div>
           </div>
 

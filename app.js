@@ -22,7 +22,67 @@ document.addEventListener("DOMContentLoaded", () => {
   renderSnippetDots();
   setupThemeToggle();
   setupStepperClick();
+  setupOtherOptionToggles();
 });
+
+// Setup dynamic specify input toggles for "Other" options
+function setupOtherOptionToggles() {
+  // Q3 Degree Other radio
+  const q3Radios = document.querySelectorAll('input[name="q3_degree"]');
+  const q3OtherBox = document.getElementById('q3_other_box');
+  q3Radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.value === 'Other' && radio.checked) {
+        q3OtherBox.classList.remove('hidden');
+        q3OtherBox.querySelector('input').focus();
+      } else {
+        q3OtherBox.classList.add('hidden');
+      }
+    });
+  });
+
+  // Q8 Tools Other checkbox
+  const q8OtherCheck = document.getElementById('q8_other_check');
+  const q8OtherBox = document.getElementById('q8_other_box');
+  if (q8OtherCheck && q8OtherBox) {
+    q8OtherCheck.addEventListener('change', () => {
+      if (q8OtherCheck.checked) {
+        q8OtherBox.classList.remove('hidden');
+        q8OtherBox.querySelector('input').focus();
+      } else {
+        q8OtherBox.classList.add('hidden');
+      }
+    });
+  }
+
+  // Q10 Uses Other checkbox
+  const q10OtherCheck = document.getElementById('q10_other_check');
+  const q10OtherBox = document.getElementById('q10_other_box');
+  if (q10OtherCheck && q10OtherBox) {
+    q10OtherCheck.addEventListener('change', () => {
+      if (q10OtherCheck.checked) {
+        q10OtherBox.classList.remove('hidden');
+        q10OtherBox.querySelector('input').focus();
+      } else {
+        q10OtherBox.classList.add('hidden');
+      }
+    });
+  }
+
+  // Q38 Factors Other checkbox
+  const q38OtherCheck = document.getElementById('q38_other_check');
+  const q38OtherBox = document.getElementById('q38_other_box');
+  if (q38OtherCheck && q38OtherBox) {
+    q38OtherCheck.addEventListener('change', () => {
+      if (q38OtherCheck.checked) {
+        q38OtherBox.classList.remove('hidden');
+        q38OtherBox.querySelector('input').focus();
+      } else {
+        q38OtherBox.classList.add('hidden');
+      }
+    });
+  }
+}
 
 function setupStepperClick() {
   document.querySelectorAll(".step-node").forEach((node) => {
@@ -386,10 +446,18 @@ function updateSnippetDots() {
 
 // Save Section Data Helpers
 function saveSectionAData() {
+  let degreeVal = getRadioVal("q3_degree");
+  if (degreeVal === "Other") {
+    const specify = document.querySelector('input[name="q3_degree_other_text"]');
+    if (specify && specify.value.trim()) {
+      degreeVal = `Other (${specify.value.trim()})`;
+    }
+  }
+
   userResponses.sectionA = {
     age: getRadioVal("q1_age"),
     gender: getRadioVal("q2_gender"),
-    degree: getRadioVal("q3_degree"),
+    degree: degreeVal,
     year: getRadioVal("q4_year"),
     experience: getRadioVal("q5_exp"),
     primary_lang: getRadioVal("q6_lang")
@@ -397,20 +465,45 @@ function saveSectionAData() {
 }
 
 function saveSectionBData() {
+  let toolsVals = getCheckboxVals("q8_tools");
+  if (toolsVals.includes("Other")) {
+    const specify = document.querySelector('input[name="q8_tools_other_text"]');
+    if (specify && specify.value.trim()) {
+      toolsVals = toolsVals.map(t => t === "Other" ? `Other (${specify.value.trim()})` : t);
+    }
+  }
+
+  let usesVals = getCheckboxVals("q10_uses");
+  if (usesVals.includes("Other")) {
+    const specify = document.querySelector('input[name="q10_uses_other_text"]');
+    if (specify && specify.value.trim()) {
+      usesVals = usesVals.map(u => u === "Other" ? `Other (${specify.value.trim()})` : u);
+    }
+  }
+
   userResponses.sectionB = {
     used_ai: getRadioVal("q7_used_ai"),
-    tools: getCheckboxVals("q8_tools"),
+    tools: toolsVals,
     frequency: getRadioVal("q9_freq"),
-    uses: getCheckboxVals("q10_uses"),
+    uses: usesVals,
     confidence: getRadioVal("q11_confidence")
   };
 }
 
 function saveSectionDData() {
   const commentsEl = document.querySelector('textarea[name="q41_comments"]');
+
+  let factorsVals = getCheckboxVals("q38_factors");
+  if (factorsVals.includes("Other")) {
+    const specify = document.querySelector('input[name="q38_factors_other_text"]');
+    if (specify && specify.value.trim()) {
+      factorsVals = factorsVals.map(f => f === "Other" ? `Other (${specify.value.trim()})` : f);
+    }
+  }
+
   userResponses.sectionD = {
     overall_difficulty: getRadioVal("q37_overall_diff"),
-    influential_factors: getCheckboxVals("q38_factors"),
+    influential_factors: factorsVals,
     ai_indistinguishable: getRadioVal("q39_ai_indistinguishable"),
     trust_ai: getRadioVal("q40_trust_ai"),
     comments: commentsEl ? commentsEl.value : ""
