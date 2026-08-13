@@ -68,7 +68,12 @@ function acceptConsent() {
     return;
   }
 
-  userResponses.consent = true;
+  userResponses.consent = {
+    agreed: true,
+    consent_status: "Agreed & Consented",
+    timestamp: new Date().toISOString(),
+    statement: "Confirmed read informed consent, 18+ years of age, voluntary academic participation."
+  };
   goToSection("sectionA");
 }
 
