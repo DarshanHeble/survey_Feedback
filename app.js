@@ -512,10 +512,36 @@ function getCheckboxVals(name) {
   return Array.from(els).map((e) => e.value);
 }
 
+const SUPABASE_URL =
+  typeof window !== "undefined" && window.ENV && window.ENV.SUPABASE_URL
+    ? window.ENV.SUPABASE_URL
+    : "";
+
+const SUPABASE_ANON_KEY =
+  typeof window !== "undefined" && window.ENV && window.ENV.SUPABASE_ANON_KEY
+    ? window.ENV.SUPABASE_ANON_KEY
+    : "";
+
 const GOOGLE_SCRIPT_URL =
   typeof window !== "undefined" && window.ENV && window.ENV.GOOGLE_SCRIPT_URL
     ? window.ENV.GOOGLE_SCRIPT_URL
     : "";
+
+let supabaseClient = null;
+if (
+  typeof window !== "undefined" &&
+  window.supabase &&
+  SUPABASE_URL &&
+  SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" &&
+  SUPABASE_ANON_KEY &&
+  SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY"
+) {
+  try {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (err) {
+    console.warn("Supabase init error:", err);
+  }
+}
 
 // SUBMIT SURVEY & CALCULATE BENCHMARK RESULTS
 function submitSurvey() {
@@ -528,22 +554,52 @@ function submitSurvey() {
     return;
   }
 
-  // Send responses to Google Sheets asynchronously
+  // 1. Submit to Supabase Database if configured
+  if (supabaseClient) {
+    const dbPayload = {
+      consent_status: userResponses.consent ? userResponses.consent.consent_status : 'Consented',
+      age: userResponses.sectionA.age || '',
+      gender: userResponses.sectionA.gender || '',
+      degree: userResponses.sectionA.degree || '',
+      year: userResponses.sectionA.year || '',
+      experience: userResponses.sectionA.experience || '',
+      primary_lang: userResponses.sectionA.primary_lang || '',
+      used_ai: userResponses.sectionB.used_ai || '',
+      tools: userResponses.sectionB.tools || [],
+      frequency: userResponses.sectionB.frequency || '',
+      uses: userResponses.sectionB.uses || [],
+      confidence: userResponses.sectionB.confidence || '',
+      overall_difficulty: userResponses.sectionD.overall_difficulty || '',
+      influential_factors: userResponses.sectionD.influential_factors || [],
+      ai_indistinguishable: userResponses.sectionD.ai_indistinguishable || '',
+      trust_ai: userResponses.sectionD.trust_ai || '',
+      comments: userResponses.sectionD.comments || '',
+      snippet_answers: userResponses.snippetAnswers || {},
+      full_payload: userResponses
+    };
+
+    supabaseClient
+      .from('survey_responses')
+      .insert([dbPayload])
+      .then(({ data, error }) => {
+        if (error) console.error("Supabase submission error:", error);
+        else console.log("Successfully saved submission to Supabase!");
+      });
+  }
+
+  // 2. Dual Backup: Send responses to Google Sheets asynchronously
   if (
     GOOGLE_SCRIPT_URL &&
     GOOGLE_SCRIPT_URL !== "YOUR_COPIED_WEB_APP_URL_HERE"
   ) {
     const payloadStr = JSON.stringify(userResponses);
 
-    // Primary: fetch with redirect follow
     fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
       body: payloadStr,
     }).catch((err) => {
-      console.error("Error submitting to Google Sheet via fetch:", err);
-      // Fallback: sendBeacon
       if (navigator.sendBeacon) {
         navigator.sendBeacon(GOOGLE_SCRIPT_URL, payloadStr);
       }
