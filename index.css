@@ -578,6 +578,10 @@ body {
   justify-content: space-between;
 }
 
+.center-footer {
+  justify-content: center;
+}
+
 /* SECTION C: DUAL CODE SNIPPET COMPARISON */
 .section-top-bar {
   display: flex;
