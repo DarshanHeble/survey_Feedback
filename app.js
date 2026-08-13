@@ -512,14 +512,14 @@ function getCheckboxVals(name) {
   return Array.from(els).map((e) => e.value);
 }
 
-const SUPABASE_URL =
-  typeof window !== "undefined" && window.ENV && window.ENV.SUPABASE_URL
-    ? window.ENV.SUPABASE_URL
+const GOOGLE_SHEETS_SPREADSHEET_ID =
+  typeof window !== "undefined" && window.ENV && window.ENV.GOOGLE_SHEETS_SPREADSHEET_ID
+    ? window.ENV.GOOGLE_SHEETS_SPREADSHEET_ID
     : "";
 
-const SUPABASE_ANON_KEY =
-  typeof window !== "undefined" && window.ENV && window.ENV.SUPABASE_ANON_KEY
-    ? window.ENV.SUPABASE_ANON_KEY
+const GOOGLE_API_KEY =
+  typeof window !== "undefined" && window.ENV && window.ENV.GOOGLE_API_KEY
+    ? window.ENV.GOOGLE_API_KEY
     : "";
 
 const GOOGLE_SCRIPT_URL =
@@ -527,20 +527,35 @@ const GOOGLE_SCRIPT_URL =
     ? window.ENV.GOOGLE_SCRIPT_URL
     : "";
 
-let supabaseClient = null;
-if (
-  typeof window !== "undefined" &&
-  window.supabase &&
-  SUPABASE_URL &&
-  SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" &&
-  SUPABASE_ANON_KEY &&
-  SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY"
-) {
-  try {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  } catch (err) {
-    console.warn("Supabase init error:", err);
-  }
+// Helper to format values for Google Sheets API row append
+function formatGoogleSheetsRow(data) {
+  const consent = data.consent || {};
+  const secA = data.sectionA || {};
+  const secB = data.sectionB || {};
+  const secD = data.sectionD || {};
+
+  return [
+    new Date().toISOString(),
+    consent.consent_status || 'Consented',
+    secA.age || '',
+    secA.gender || '',
+    secA.degree || '',
+    secA.year || '',
+    secA.experience || '',
+    secA.primary_lang || '',
+    secB.used_ai || '',
+    Array.isArray(secB.tools) ? secB.tools.join(', ') : '',
+    secB.frequency || '',
+    Array.isArray(secB.uses) ? secB.uses.join(', ') : '',
+    secB.confidence || '',
+    secD.overall_difficulty || '',
+    Array.isArray(secD.influential_factors) ? secD.influential_factors.join(', ') : '',
+    secD.ai_indistinguishable || '',
+    secD.trust_ai || '',
+    secD.comments || '',
+    JSON.stringify(data.snippetAnswers || {}),
+    JSON.stringify(data)
+  ];
 }
 
 // SUBMIT SURVEY & CALCULATE BENCHMARK RESULTS
@@ -554,40 +569,29 @@ function submitSurvey() {
     return;
   }
 
-  // 1. Submit to Supabase Database if configured
-  if (supabaseClient) {
-    const dbPayload = {
-      consent_status: userResponses.consent ? userResponses.consent.consent_status : 'Consented',
-      age: userResponses.sectionA.age || '',
-      gender: userResponses.sectionA.gender || '',
-      degree: userResponses.sectionA.degree || '',
-      year: userResponses.sectionA.year || '',
-      experience: userResponses.sectionA.experience || '',
-      primary_lang: userResponses.sectionA.primary_lang || '',
-      used_ai: userResponses.sectionB.used_ai || '',
-      tools: userResponses.sectionB.tools || [],
-      frequency: userResponses.sectionB.frequency || '',
-      uses: userResponses.sectionB.uses || [],
-      confidence: userResponses.sectionB.confidence || '',
-      overall_difficulty: userResponses.sectionD.overall_difficulty || '',
-      influential_factors: userResponses.sectionD.influential_factors || [],
-      ai_indistinguishable: userResponses.sectionD.ai_indistinguishable || '',
-      trust_ai: userResponses.sectionD.trust_ai || '',
-      comments: userResponses.sectionD.comments || '',
-      snippet_answers: userResponses.snippetAnswers || {},
-      full_payload: userResponses
-    };
+  // 1. Submit directly via Google Sheets REST API v4 if Spreadsheet ID & API Key are configured
+  if (
+    GOOGLE_SHEETS_SPREADSHEET_ID &&
+    GOOGLE_SHEETS_SPREADSHEET_ID !== "YOUR_GOOGLE_SPREADSHEET_ID_HERE" &&
+    GOOGLE_API_KEY &&
+    GOOGLE_API_KEY !== "YOUR_GOOGLE_API_KEY_HERE"
+  ) {
+    const rowValues = formatGoogleSheetsRow(userResponses);
+    const apiEndpoint = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_SPREADSHEET_ID}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&key=${GOOGLE_API_KEY}`;
 
-    supabaseClient
-      .from('survey_responses')
-      .insert([dbPayload])
-      .then(({ data, error }) => {
-        if (error) console.error("Supabase submission error:", error);
-        else console.log("Successfully saved submission to Supabase!");
-      });
+    fetch(apiEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        values: [rowValues]
+      })
+    })
+      .then(res => res.json())
+      .then(result => console.log("Google Sheets API Append Result:", result))
+      .catch(err => console.error("Google Sheets API Error:", err));
   }
 
-  // 2. Dual Backup: Send responses to Google Sheets asynchronously
+  // 2. Backup: Submit via Google Apps Script Web App Endpoint
   if (
     GOOGLE_SCRIPT_URL &&
     GOOGLE_SCRIPT_URL !== "YOUR_COPIED_WEB_APP_URL_HERE"
