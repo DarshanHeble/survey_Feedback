@@ -568,9 +568,16 @@ function formatGoogleSheetsRow(data) {
   const secB = data.sectionB || {};
   const secD = data.sectionD || {};
 
+  let consentText = "Agreed & Consented";
+  if (typeof consent === "object" && consent.statement) {
+    consentText = `Agreed (${consent.statement})`;
+  } else if (typeof consent === "boolean") {
+    consentText = consent ? "Agreed & Consented" : "Declined";
+  }
+
   return [
     new Date().toISOString(),
-    consent.consent_status || 'Consented',
+    consentText,
     secA.age || '',
     secA.gender || '',
     secA.degree || '',
