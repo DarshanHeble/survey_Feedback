@@ -712,18 +712,6 @@ function submitSurvey() {
       .catch((err) => console.error("Netlify Forms error:", err));
   }
 
-  // Direct Google Sheets REST API v4 Append
-  if (
-    GOOGLE_SHEETS_SPREADSHEET_ID &&
-    GOOGLE_SHEETS_SPREADSHEET_ID !== "YOUR_GOOGLE_SPREADSHEET_ID_HERE"
-  ) {
-    if (tokenClient && !googleAccessToken) {
-      tokenClient.requestAccessToken({ prompt: '' });
-    } else {
-      executeSheetsAppend(userResponses);
-    }
-  }
-
   // Calculate Accuracy
   let correctCount = 0;
   let totalEvaluated = activeTaskSnippets.length;
