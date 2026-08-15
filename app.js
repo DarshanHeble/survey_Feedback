@@ -166,7 +166,11 @@ function validateCurrentSnippet() {
   if (!currentItem) return true;
   const ans = userResponses.snippetAnswers[currentItem.id];
   if (!ans || !ans.userChoice) {
-    alert(`Please select your answer for Question ${activeSnippetIndex + 1} before proceeding.`);
+    alert(`Please select your code snippet answer (Snippet A, Snippet B, or Cannot Determine) for Question ${activeSnippetIndex + 1} before proceeding.`);
+    return false;
+  }
+  if (!ans.confidence) {
+    alert(`Please select your confidence rating (1-5) for Question ${activeSnippetIndex + 1} before proceeding.`);
     return false;
   }
   return true;
@@ -376,7 +380,7 @@ function saveCurrentSnippetData() {
 
   userResponses.snippetAnswers[item.id] = {
     userChoice: selectedChoice ? selectedChoice.value : null,
-    confidence: selectedConf ? selectedConf.value : "3",
+    confidence: selectedConf ? selectedConf.value : null,
   };
 }
 
