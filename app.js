@@ -707,7 +707,7 @@ function submitSurvey() {
       .catch((err) => console.error("Netlify Forms error:", err));
   }
 
-  // 2. Google Sheets REST API v4 Append (Primary for Sheets)
+  // Direct Google Sheets REST API v4 Append
   if (
     GOOGLE_SHEETS_SPREADSHEET_ID &&
     GOOGLE_SHEETS_SPREADSHEET_ID !== "YOUR_GOOGLE_SPREADSHEET_ID_HERE"
@@ -717,23 +717,6 @@ function submitSurvey() {
     } else {
       executeSheetsAppend(userResponses);
     }
-  } else if (
-    // 3. Backup: Submit via Google Apps Script Web App Endpoint ONLY if Sheets API ID is not configured
-    GOOGLE_SCRIPT_URL &&
-    GOOGLE_SCRIPT_URL !== "YOUR_COPIED_WEB_APP_URL_HERE"
-  ) {
-    const payloadStr = JSON.stringify(userResponses);
-
-    fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: payloadStr,
-    }).catch((err) => {
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(GOOGLE_SCRIPT_URL, payloadStr);
-      }
-    });
   }
 
   // Calculate Accuracy
