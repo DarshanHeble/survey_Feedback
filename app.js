@@ -251,7 +251,7 @@ function updateStepper(stepNum, headerText) {
 
 // Start Snippet Tasks (Section C)
 function startSnippetTasks() {
-  saveSectionBData();
+  if (!validateSectionB()) return;
 
   // Get user's selected language from Q6
   const selectedLang = getRadioVal("q6_lang") || "Python";
