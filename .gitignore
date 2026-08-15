@@ -1,5 +1,5 @@
 # Environment config & secrets
-env.js
+# env.js is intentionally tracked - it's required by the browser at runtime
 
 # Node / dependencies
 node_modules/
