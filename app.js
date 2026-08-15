@@ -585,10 +585,10 @@ function formatGoogleSheetsRow(data) {
   }
 
   return [
-    new Date().toISOString(),
-    consentText,                           // Col 2: Consent Status
-    secA.full_name || '',                  // Col 3: Full Name
-    secA.college || '',                    // Col 4: College / Institution Name
+    new Date().toISOString(),              // Col 1: Timestamp
+    secA.full_name || '',                  // Col 2: Full Name
+    secA.college || '',                    // Col 3: College / Institution Name
+    consentText,                           // Col 4: Consent Status
     secA.age || '',                        // Col 5: Age
     secA.gender || '',                     // Col 6: Gender
     secA.degree || '',                     // Col 7: Degree Program
