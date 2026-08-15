@@ -23,7 +23,40 @@ document.addEventListener("DOMContentLoaded", () => {
   setupThemeToggle();
   setupStepperClick();
   setupOtherOptionToggles();
+  setupNoneCheckboxExclusivity();
 });
+
+// Mutual exclusivity for "None" checkbox options
+function setupNoneCheckboxExclusivity() {
+  const checkboxGroups = document.querySelectorAll('.checkbox-options');
+  checkboxGroups.forEach(group => {
+    const checkboxes = group.querySelectorAll('input[type="checkbox"]');
+    const noneCheckbox = Array.from(checkboxes).find(cb => cb.value.toLowerCase() === 'none');
+    if (!noneCheckbox) return;
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb === noneCheckbox) {
+          if (noneCheckbox.checked) {
+            // Uncheck all other options in this group
+            checkboxes.forEach(otherCb => {
+              if (otherCb !== noneCheckbox) {
+                otherCb.checked = false;
+                // Dispatch change event to hide specify boxes if applicable
+                otherCb.dispatchEvent(new Event('change'));
+              }
+            });
+          }
+        } else {
+          if (cb.checked && noneCheckbox.checked) {
+            // Uncheck "None" if any specific option is selected
+            noneCheckbox.checked = false;
+          }
+        }
+      });
+    });
+  });
+}
 
 // Setup dynamic specify input toggles for "Other" options
 function setupOtherOptionToggles() {
