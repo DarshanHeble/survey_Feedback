@@ -677,33 +677,38 @@ function submitSurvey() {
 
   // 1. Submit to Netlify Forms (Native Netlify / Netlify AI hosting detection)
   if (typeof window !== "undefined" && window.location.hostname.includes("netlify")) {
-    const formData = new FormData();
-    formData.append("form-name", "survey_Feedback");
-    formData.append("full_name", userResponses.sectionA.full_name || "");
-    formData.append("college", userResponses.sectionA.college || "");
-    formData.append("age", userResponses.sectionA.age || "");
-    formData.append("gender", userResponses.sectionA.gender || "");
-    formData.append("degree", userResponses.sectionA.degree || "");
-    formData.append("year", userResponses.sectionA.year || "");
-    formData.append("experience", userResponses.sectionA.experience || "");
-    formData.append("primary_lang", userResponses.sectionA.primary_lang || "");
-    formData.append("used_ai", userResponses.sectionB.used_ai || "");
-    formData.append("tools", Array.isArray(userResponses.sectionB.tools) ? userResponses.sectionB.tools.join(", ") : "");
-    formData.append("frequency", userResponses.sectionB.frequency || "");
-    formData.append("uses", Array.isArray(userResponses.sectionB.uses) ? userResponses.sectionB.uses.join(", ") : "");
-    formData.append("confidence", userResponses.sectionB.confidence || "");
-    formData.append("overall_difficulty", userResponses.sectionD.overall_difficulty || "");
-    formData.append("influential_factors", Array.isArray(userResponses.sectionD.influential_factors) ? userResponses.sectionD.influential_factors.join(", ") : "");
-    formData.append("ai_indistinguishable", userResponses.sectionD.ai_indistinguishable || "");
-    formData.append("trust_ai", userResponses.sectionD.trust_ai || "");
-    formData.append("comments", userResponses.sectionD.comments || "");
-    formData.append("snippetAnswers", JSON.stringify(userResponses.snippetAnswers || {}));
-    formData.append("full_payload", JSON.stringify(userResponses));
+    const params = new URLSearchParams();
+    params.append("form-name", "survey_Feedback");
+    params.append("full_name", userResponses.sectionA.full_name || "");
+    params.append("college", userResponses.sectionA.college || "");
+    params.append("age", userResponses.sectionA.age || "");
+    params.append("gender", userResponses.sectionA.gender || "");
+    params.append("degree", userResponses.sectionA.degree || "");
+    params.append("year", userResponses.sectionA.year || "");
+    params.append("experience", userResponses.sectionA.experience || "");
+    params.append("primary_lang", userResponses.sectionA.primary_lang || "");
+    params.append("used_ai", userResponses.sectionB.used_ai || "");
+    params.append("tools", Array.isArray(userResponses.sectionB.tools) ? userResponses.sectionB.tools.join(", ") : "");
+    params.append("frequency", userResponses.sectionB.frequency || "");
+    params.append("uses", Array.isArray(userResponses.sectionB.uses) ? userResponses.sectionB.uses.join(", ") : "");
+    params.append("confidence", userResponses.sectionB.confidence || "");
+    params.append("overall_difficulty", userResponses.sectionD.overall_difficulty || "");
+    params.append("influential_factors", Array.isArray(userResponses.sectionD.influential_factors) ? userResponses.sectionD.influential_factors.join(", ") : "");
+    params.append("ai_indistinguishable", userResponses.sectionD.ai_indistinguishable || "");
+    params.append("trust_ai", userResponses.sectionD.trust_ai || "");
+    params.append("comments", userResponses.sectionD.comments || "");
+    params.append("snippetAnswers", JSON.stringify(userResponses.snippetAnswers || {}));
+    params.append("full_payload", JSON.stringify(userResponses));
 
     fetch("/", {
       method: "POST",
-      body: formData,
-    }).then(() => console.log("Successfully submitted to Netlify Forms!"))
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    })
+      .then((res) => {
+        if (res.ok) console.log("Successfully submitted to Netlify Forms!");
+        else console.warn("Netlify Forms response:", res.status);
+      })
       .catch((err) => console.error("Netlify Forms error:", err));
   }
 
