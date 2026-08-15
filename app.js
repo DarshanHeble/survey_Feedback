@@ -142,8 +142,8 @@ function initSnippets() {
 function validateSectionA() {
   saveSectionAData();
   const secA = userResponses.sectionA;
-  if (!secA.age || !secA.gender || !secA.degree || !secA.year || !secA.experience || !secA.primary_lang) {
-    alert("Please fill out all required fields in Section A before proceeding.");
+  if (!secA.full_name || !secA.college || !secA.age || !secA.gender || !secA.degree || !secA.year || !secA.experience || !secA.primary_lang) {
+    alert("Please fill out all required fields in Section A (including Full Name and College Name) before proceeding.");
     return false;
   }
   return true;
@@ -450,7 +450,12 @@ function saveSectionAData() {
     }
   }
 
+  const nameInput = document.querySelector('input[name="user_fullname"]');
+  const collegeInput = document.querySelector('input[name="user_college"]');
+
   userResponses.sectionA = {
+    full_name: nameInput ? nameInput.value.trim() : "",
+    college: collegeInput ? collegeInput.value.trim() : "",
     age: getRadioVal("q1_age"),
     gender: getRadioVal("q2_gender"),
     degree: degreeVal,
@@ -582,24 +587,26 @@ function formatGoogleSheetsRow(data) {
   return [
     new Date().toISOString(),
     consentText,                           // Col 2: Consent Status
-    secA.age || '',                        // Col 3: Age
-    secA.gender || '',                     // Col 4: Gender
-    secA.degree || '',                     // Col 5: Degree Program
-    secA.year || '',                       // Col 6: Current Year
-    secA.experience || '',                 // Col 7: Programming Experience
-    secA.primary_lang || '',               // Col 8: Primary Language
-    secB.used_ai || '',                    // Col 9: Used AI Tools
-    Array.isArray(secB.tools) ? secB.tools.join(', ') : '',       // Col 10: AI Tools Used
-    secB.frequency || '',                  // Col 11: AI Usage Frequency
-    Array.isArray(secB.uses) ? secB.uses.join(', ') : '',         // Col 12: AI Purpose
-    secB.confidence || '',                 // Col 13: AI Confidence
-    secD.overall_difficulty || '',         // Col 14: Overall Difficulty
-    Array.isArray(secD.influential_factors) ? secD.influential_factors.join(', ') : '', // Col 15: Influential Factors
-    secD.ai_indistinguishable || '',       // Col 16: AI Indistinguishable Perception
-    secD.trust_ai || '',                   // Col 17: Trust in AI Code
-    secD.comments || '',                   // Col 18: Comments & Feedback
-    JSON.stringify(data.snippetAnswers || {}), // Col 19: Snippet Answers
-    JSON.stringify(data)                   // Col 20: Full Data JSON
+    secA.full_name || '',                  // Col 3: Full Name
+    secA.college || '',                    // Col 4: College / Institution Name
+    secA.age || '',                        // Col 5: Age
+    secA.gender || '',                     // Col 6: Gender
+    secA.degree || '',                     // Col 7: Degree Program
+    secA.year || '',                       // Col 8: Current Year
+    secA.experience || '',                 // Col 9: Programming Experience
+    secA.primary_lang || '',               // Col 10: Primary Language
+    secB.used_ai || '',                    // Col 11: Used AI Tools
+    Array.isArray(secB.tools) ? secB.tools.join(', ') : '',       // Col 12: AI Tools Used
+    secB.frequency || '',                  // Col 13: AI Usage Frequency
+    Array.isArray(secB.uses) ? secB.uses.join(', ') : '',         // Col 14: AI Purpose
+    secB.confidence || '',                 // Col 15: AI Confidence
+    secD.overall_difficulty || '',         // Col 16: Overall Difficulty
+    Array.isArray(secD.influential_factors) ? secD.influential_factors.join(', ') : '', // Col 17: Influential Factors
+    secD.ai_indistinguishable || '',       // Col 18: AI Indistinguishable Perception
+    secD.trust_ai || '',                   // Col 19: Trust in AI Code
+    secD.comments || '',                   // Col 20: Comments & Feedback
+    JSON.stringify(data.snippetAnswers || {}), // Col 21: Snippet Answers
+    JSON.stringify(data)                   // Col 22: Full Data JSON
   ];
 }
 
