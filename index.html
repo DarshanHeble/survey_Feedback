@@ -72,8 +72,11 @@
       </div>
     </div>
 
-    <!-- FORM CONTAINER -->
-    <form id="surveyForm" onsubmit="event.preventDefault();">
+    <!-- FORM CONTAINER (Configured for Netlify & Netlify AI integration) -->
+    <form id="surveyForm" name="survey_Feedback" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" onsubmit="event.preventDefault();">
+      <!-- Netlify Bot Field -->
+      <input type="hidden" name="form-name" value="survey_Feedback" />
+      <p class="hidden-section"><label>Don’t fill this out if you’re human: <input name="bot-field" /></label></p>
 
       <!-- SECTION 0: INFORMED CONSENT PAGE -->
       <section class="survey-card active-section" id="sectionConsent">
