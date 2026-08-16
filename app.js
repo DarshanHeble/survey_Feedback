@@ -712,6 +712,22 @@ function submitSurvey() {
       .catch((err) => console.error("Netlify Forms error:", err));
   }
 
+  // 2. Always submit to Google Apps Script (works on localhost AND Netlify)
+  if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_COPIED_WEB_APP_URL_HERE") {
+    const payloadStr = JSON.stringify(userResponses);
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: payloadStr,
+    })
+      .then(() => console.log("Response posted to Google Sheet via Apps Script!"))
+      .catch((err) => {
+        console.error("Apps Script fetch error:", err);
+        if (navigator.sendBeacon) navigator.sendBeacon(GOOGLE_SCRIPT_URL, payloadStr);
+      });
+  }
+
   // Calculate Accuracy
   let correctCount = 0;
   let totalEvaluated = activeTaskSnippets.length;
